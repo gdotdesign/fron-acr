@@ -1,6 +1,14 @@
 module Fron
   module ActiveRecord
     class Manager
+      class << self
+        attr_reader :endpoint
+
+        def endpoint=(endpoint)
+          @endpoint = endpoint
+        end
+      end
+
       def initialize(path, klass = nil)
         @path = path
         @class = klass
@@ -37,7 +45,7 @@ module Fron
       end
 
       def request(method, url, params = {})
-        req = Fron::Request.new "#{@path}#{url}", "Content-Type" => 'application/json'
+        req = Fron::Request.new "#{self.class.endpoint.to_s}#{@path}#{url}", "Content-Type" => 'application/json'
         req.request method.upcase, params do |response|
           if (200..300).cover?(response.status)
             yield response.json
