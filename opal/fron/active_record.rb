@@ -1,0 +1,5 @@
+require 'opal'
+require 'fron'
+require 'fron/active_record/manager'
+require 'fron/active_record/record'
+require 'fron/active_record/models'

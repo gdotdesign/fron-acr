@@ -1,0 +1,11 @@
+<% Fron::ActiveRecord::Model.tables.each do |table| %>
+Fron::ActiveRecord::Record::Manager.model '<%= table.model.name.downcase %>', '/api/<%= table.get_or_set(:namespace_inheritable, :root_prefix, nil) %>'
+class <%= table.model.name %> < Fron::ActiveRecord::Record
+	class <%= table.model.name %>::List < Fron::ActiveRecord::Record::List
+		model '<%= table.model.name.downcase %>'
+	end
+
+	model '<%= table.model.name.downcase %>'
+<%= table.model.columns_hash.map { |key, prop| "property :#{key}, :#{prop.type}" }.join("\n") + "\n" %>
+end
+<% end %>

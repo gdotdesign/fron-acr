@@ -1,0 +1,40 @@
+PATH
+  remote: .
+  specs:
+    fron-acr (0.1.0)
+      activesupport
+      opal (~> 0.6.2)
+      sprockets (~> 2.12.3)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (3.2.21)
+      i18n (~> 0.6, >= 0.6.4)
+      multi_json (~> 1.0)
+    hike (1.2.3)
+    i18n (0.6.11)
+    json (1.8.2)
+    multi_json (1.10.1)
+    opal (0.6.3)
+      source_map
+      sprockets
+    opal-rspec (0.3.0.beta3)
+      opal (>= 0.6.0, < 1.0.0)
+    rack (1.6.0)
+    source_map (3.0.1)
+      json
+    sprockets (2.12.3)
+      hike (~> 1.2)
+      multi_json (~> 1.0)
+      rack (~> 1.0)
+      tilt (~> 1.1, != 1.3.0)
+    tilt (1.4.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  fron-acr!
+  opal-rspec (~> 0.3.0.beta3)
+  rack
