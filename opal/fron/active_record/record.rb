@@ -41,14 +41,23 @@ module Fron
         extend Manageable
 
         class << self
+          def render_self!(order_key = :id)
+            define_method :render do
+              empty
+              @items.sort_by { |item| item.data[order_key] }.each do |item|
+                item >> self
+              end
+            end
+          end
+
           def base(klass = nil)
             return @base unless klass
             @base = klass
           end
         end
 
-        def all
-          manager.all do |records|
+        def where(params)
+          manager.where(params) do |records|
             yield records.map { |data| create_item data }
           end
         end
@@ -62,12 +71,11 @@ module Fron
         def initialize
           super nil
           @items = []
-          update
         end
 
-        def update
+        def update(params = {})
           @items.clear
-          all do |items|
+          where(params) do |items|
             @items = items
             render if respond_to? :render
           end
@@ -84,6 +92,8 @@ module Fron
       end
 
       extend Manageable
+
+      attr_reader :data
 
       class << self
         def path(value)
@@ -110,13 +120,13 @@ module Fron
       def update(data)
         manager.update @data[:id].to_i, data do |data|
           @data.merge! data
-          yield
+          yield if block_given?
         end
       end
 
       def destroy!
         self.class.manager.destroy @data[:id] do
-          yield
+          yield if block_given?
         end
       end
 
