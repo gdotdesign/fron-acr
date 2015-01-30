@@ -40,6 +40,11 @@ module Fron
 
           helpers do
             params(:object) do
+              @api.instance_variable_get('@model').reflect_on_all_associations(:has_many)
+                .map { |assoc| "#{assoc.name.to_s.singularize}_ids".to_sym }.each do |assoc|
+                optional assoc
+              end
+
               (@api.instance_variable_get('@model').column_names - ['id']).each do |name|
                 optional name
               end
