@@ -1,5 +1,16 @@
 require 'active_support'
 
+class Hash
+  def compact(opts={})
+    inject({}) do |new_hash, (k,v)|
+      if !v.blank?
+        new_hash[k] = opts[:recurse] && v.class == Hash ? v.compact(opts) : v
+      end
+      new_hash
+    end
+  end
+end
+
 module Fron
   module ActiveRecord
     module Model
@@ -25,7 +36,7 @@ module Fron
 
           @model = name.split('::').last.constantize
 
-          prefix @model.name.downcase.pluralize
+          prefix @model.name.demodulize.underscore
 
           helpers do
             params(:object) do
@@ -46,7 +57,7 @@ module Fron
 
           params { use :object }
           route :any, :where do
-            model.where(declared(params, include_missing: false)).to_a
+            model.where(declared(params, include_missing: false).compact).to_a
           end
 
           params { requires :id }
@@ -70,7 +81,7 @@ module Fron
           end
           route :any, :update do
             item = model.find(params[:id])
-            item.update_attributes!(declared(params))
+            item.update_attributes!(declared(params, include_missing: false))
             item
           end
         end

@@ -34,6 +34,14 @@ module Fron
         request :post, '/update', { id: id}.merge(data), &block
       end
 
+      def update_or_create(id, data, &block)
+        if id
+          update id, data, &block
+        else
+          create data, &block
+        end
+      end
+
       def destroy(id, &block)
         request :post, '/destroy', { id: id}, &block
       end
