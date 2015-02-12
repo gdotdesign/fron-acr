@@ -90,6 +90,7 @@ module Fron
             item = model.new data
             authorize! :create, item
             item.save!
+            item
           end
 
           params { requires :id }
