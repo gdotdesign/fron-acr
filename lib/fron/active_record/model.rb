@@ -79,13 +79,24 @@ module Fron
             model.accessible_by(ability, :read).where(declared(params, include_missing: false).compact).to_a
           end
 
+        end
+
+        def rest_actions
           params { requires :id }
-          route :any, :find do
-            authorize! :read, model.find(params[:id])
+          route_param :id do
+            get do
+              authorize! :read, model.find(params[:id])
+            end
+
+            delete do
+              item = model.find(params[:id])
+              authorize! :destroy, item
+              item.destroy
+            end
           end
 
           params { use :object }
-          route :any, :create do
+          post do
             data = declared(params)
             item = model.new data
             authorize! :create, item
@@ -93,22 +104,17 @@ module Fron
             item
           end
 
-          params { requires :id }
-          route :any, :destroy do
-            item = model.find(params[:id])
-            authorize! :destroy, item
-            item.destroy
-          end
-
           params do
             use :object
             requires :id
           end
-          route :any, :update do
-            item = model.find(params[:id])
-            authorize! :update, item
-            item.update_attributes!(declared(params, include_missing: false))
-            item
+          route_param :id do
+            put do
+              item = model.find(params[:id])
+              authorize! :update, item
+              item.update_attributes!(declared(params, include_missing: false))
+              item
+            end
           end
         end
       end
