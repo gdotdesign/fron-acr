@@ -18,5 +18,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'opal', ['~> 0.6.2']
   s.add_runtime_dependency 'sprockets', '~> 2.12.3'
   s.add_runtime_dependency 'activesupport'
+  s.add_runtime_dependency 'cancancan', '~> 1.10'
   s.add_development_dependency 'opal-rspec', '~> 0.3.0.beta3'
 end

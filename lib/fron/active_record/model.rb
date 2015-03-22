@@ -1,4 +1,6 @@
 require 'active_support'
+require 'cancancan'
+require_relative '../ability'
 
 class Hash
   def compact(opts={})
@@ -32,6 +34,7 @@ module Fron
         def setup
           rescue_from ::ActiveRecord::RecordNotFound, ::ActiveRecord::RecordInvalid
 
+          rescue_from CanCan::AccessDenied
           format :json
 
           @model = name.split('::').last.constantize
@@ -45,34 +48,56 @@ module Fron
                 optional assoc
               end
 
-              (@api.instance_variable_get('@model').column_names - ['id']).each do |name|
+              (@api.instance_variable_get('@model').column_names).each do |name|
                 optional name
               end
+            end
+
+            def ability
+              @ability ||= Ability.new(current_user || {})
+            end
+
+            def authorize!(action, subject, *args)
+              ability.authorize!(action, subject, *args)
+            end
+
+            def can?(action, subject, *extra_args)
+              ability.can?(action, subject, *extra_args)
             end
 
             def model
               env['api.endpoint'].options[:for].instance_variable_get('@model')
             end
+
+            def model_name_sym
+              model.name.downcase.pluralize.to_sym
+            end
           end
 
           params { use :object }
           route :any, :where do
-            model.where(declared(params, include_missing: false).compact).to_a
+            model.accessible_by(ability, :read).where(declared(params, include_missing: false).compact).to_a
           end
 
           params { requires :id }
           route :any, :find do
-            model.find params[:id]
+            authorize! :read, model.find(params[:id])
           end
 
           params { use :object }
           route :any, :create do
-            model.create! declared(params)
+            data = declared(params)
+            item = model.new data
+            authorize! :create, item
+            item.save!
+            item
           end
 
           params { requires :id }
           route :any, :destroy do
-            model.find(params[:id]).destroy
+            item = model.find(params[:id])
+            authorize! :destroy, item
+            item.destroy
           end
 
           params do
@@ -81,6 +106,7 @@ module Fron
           end
           route :any, :update do
             item = model.find(params[:id])
+            authorize! :update, item
             item.update_attributes!(declared(params, include_missing: false))
             item
           end
