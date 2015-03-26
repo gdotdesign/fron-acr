@@ -25,13 +25,13 @@ module Fron
       end
 
       def find(id)
-        request :post, '/find', id: id do |data|
+        request :get, "/#{id}" do |data|
           yield data
         end
       end
 
       def update(id, data, &block)
-        request :post, '/update', { id: id}.merge(data), &block
+        request :put, "/#{id}", data, &block
       end
 
       def update_or_create(id, data, &block)
@@ -43,11 +43,11 @@ module Fron
       end
 
       def destroy(id, &block)
-        request :post, '/destroy', { id: id}, &block
+        request :delete, "/#{id}", &block
       end
 
       def create(data)
-        request :post, '/create', data do |response|
+        request :post, '/', data do |response|
           yield response
         end
       end
