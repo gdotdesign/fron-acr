@@ -75,7 +75,7 @@ module Fron
           end
 
           params { use :object }
-          route :any, :where do
+          route :any, :where, hidden: true do
             model.accessible_by(ability, :read).where(declared(params, include_missing: false).compact).to_a
           end
 
